@@ -22,6 +22,7 @@ import { Remolcadores } from './models/remolcadores.model';
 import { Boxes } from './models/boxes.model';
 import { Puertos } from './models/puertos.model';
 import { Movimientos } from './models/movimientos.model';
+import { UploadController } from './services/upload.controller';
 
 @Module({
   imports: [
@@ -49,7 +50,7 @@ import { Movimientos } from './models/movimientos.model';
     PuertosModule,
     MovimientosModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, UploadController],
   providers: [AppService],
 })
 export class AppModule {}
