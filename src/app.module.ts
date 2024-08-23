@@ -23,6 +23,8 @@ import { Boxes } from './models/boxes.model';
 import { Puertos } from './models/puertos.model';
 import { Movimientos } from './models/movimientos.model';
 import { UploadController } from './services/upload.controller';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -39,6 +41,10 @@ import { UploadController } from './services/upload.controller';
       autoLoadModels: true,
       synchronize: true,
       models: [Productos, Proveedores, Importadores, Buques, Barcazas, Remolcadores, Boxes, Puertos, Movimientos],
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
     }),
     ProductosModule,
     ProveedoresModule,

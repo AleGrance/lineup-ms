@@ -47,6 +47,24 @@ export class Movimientos extends Model<Movimientos> {
   })
   horaFin: Date;
 
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  urlManifiesto: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  urlBL: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  urlExpediente: string;
+
   // Importador
   @ForeignKey(() => Importadores)
   @Column

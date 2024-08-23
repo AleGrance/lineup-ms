@@ -42,7 +42,7 @@ export class MovimientosService {
         { model: Remolcadores, attributes: ['nombre'] },
         { model: Boxes, attributes: ['marca'] },
         { model: Puertos, attributes: ['nombre'] },
-      ]
+      ],
     });
   }
 
@@ -64,6 +64,7 @@ export class MovimientosService {
     id: number,
     updateMovimientoDto: UpdateMovimientoDto,
   ): Promise<HttpException> {
+    console.log(updateMovimientoDto)
     const movimientoFound = await this.findOne(id);
 
     // Comparar los valores proporcionados con los valores actuales
@@ -73,7 +74,9 @@ export class MovimientosService {
       'fechaArribo',
       'horaInicio',
       'horaFin',
-
+      'urlManifiesto',
+      'urlBL',
+      'urlExpediente',
       'importadorId',
       'proveedorId',
       'productoId',
@@ -103,7 +106,8 @@ export class MovimientosService {
       }
 
       if (updateMovimientoDto.fechaProbDescarga) {
-        movimientoFound.fechaProbDescarga = updateMovimientoDto.fechaProbDescarga;
+        movimientoFound.fechaProbDescarga =
+          updateMovimientoDto.fechaProbDescarga;
       }
 
       if (updateMovimientoDto.fechaArribo) {
@@ -116,6 +120,18 @@ export class MovimientosService {
 
       if (updateMovimientoDto.horaFin) {
         movimientoFound.horaFin = updateMovimientoDto.horaFin;
+      }
+
+      if (updateMovimientoDto.urlManifiesto) {
+        movimientoFound.urlManifiesto = updateMovimientoDto.urlManifiesto;
+      }
+
+      if (updateMovimientoDto.urlBL) {
+        movimientoFound.urlBL = updateMovimientoDto.urlBL;
+      }
+
+      if (updateMovimientoDto.urlExpediente) {
+        movimientoFound.urlExpediente = updateMovimientoDto.urlExpediente;
       }
 
       if (updateMovimientoDto.importadorId) {
@@ -154,7 +170,7 @@ export class MovimientosService {
       await movimientoFound.save();
 
       return new HttpException(
-        'Buque actualizado correctamente',
+        'Movimiento actualizado correctamente',
         HttpStatus.OK,
       );
     } catch (error) {
