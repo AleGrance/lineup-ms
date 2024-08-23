@@ -1,4 +1,11 @@
-import { Column, Model, Table, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import {
+  Column,
+  Model,
+  Table,
+  DataType,
+  ForeignKey,
+  BelongsTo,
+} from 'sequelize-typescript';
 import { Importadores } from './importadores.model';
 import { Proveedores } from './proveedores.model';
 import { Productos } from './productos.model';
@@ -7,6 +14,7 @@ import { Barcazas } from './barcazas.model';
 import { Remolcadores } from './remolcadores.model';
 import { Boxes } from './boxes.model';
 import { Puertos } from './puertos.model';
+import { Estados } from './estados';
 
 @Table
 export class Movimientos extends Model<Movimientos> {
@@ -65,6 +73,10 @@ export class Movimientos extends Model<Movimientos> {
   })
   urlExpediente: string;
 
+  /**
+   *  RELATIONS
+   */
+
   // Importador
   @ForeignKey(() => Importadores)
   @Column
@@ -79,7 +91,7 @@ export class Movimientos extends Model<Movimientos> {
   proveedorId: number;
 
   @BelongsTo(() => Proveedores)
-  proveedor: Importadores;
+  proveedor: Proveedores;
 
   // Producto
   @ForeignKey(() => Productos)
@@ -87,7 +99,7 @@ export class Movimientos extends Model<Movimientos> {
   productoId: number;
 
   @BelongsTo(() => Productos)
-  producto: Importadores;
+  producto: Productos;
 
   // Buque
   @ForeignKey(() => Buques)
@@ -95,7 +107,7 @@ export class Movimientos extends Model<Movimientos> {
   buqueId: number;
 
   @BelongsTo(() => Buques)
-  buque: Importadores;
+  buque: Buques;
 
   // Barcaza
   @ForeignKey(() => Barcazas)
@@ -103,7 +115,7 @@ export class Movimientos extends Model<Movimientos> {
   barcazaId: number;
 
   @BelongsTo(() => Barcazas)
-  barcaza: Importadores;
+  barcaza: Barcazas;
 
   // Remolcador
   @ForeignKey(() => Remolcadores)
@@ -111,7 +123,7 @@ export class Movimientos extends Model<Movimientos> {
   remolcadorId: number;
 
   @BelongsTo(() => Remolcadores)
-  remolcador: Importadores;
+  remolcador: Remolcadores;
 
   // Box
   @ForeignKey(() => Boxes)
@@ -119,7 +131,7 @@ export class Movimientos extends Model<Movimientos> {
   boxId: number;
 
   @BelongsTo(() => Boxes)
-  box: Importadores;
+  box: Boxes;
 
   // Puerto
   @ForeignKey(() => Puertos)
@@ -127,5 +139,15 @@ export class Movimientos extends Model<Movimientos> {
   puertoId: number;
 
   @BelongsTo(() => Puertos)
-  puerto: Importadores;
+  puerto: Puertos;
+
+  // Estado
+  @ForeignKey(() => Estados)
+  @Column({
+    defaultValue: 2
+  })
+  estadoId: number;
+
+  @BelongsTo(() => Estados)
+  estado: Estados;
 }

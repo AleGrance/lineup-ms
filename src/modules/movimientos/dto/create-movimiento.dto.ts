@@ -1,6 +1,7 @@
 import {
   IsDateString,
   IsNotEmpty,
+  IsOptional,
   IsPositive,
   IsString,
   IsTimeZone,
@@ -24,6 +25,10 @@ export class CreateMovimientoDto {
 
   @IsNotEmpty()
   horaFin: Date;
+
+  /**
+   *  RELATIONS
+   */
 
   @IsPositive()
   @IsNotEmpty()
@@ -56,4 +61,8 @@ export class CreateMovimientoDto {
   @IsPositive()
   @IsNotEmpty()
   puertoId: number;
+
+  @IsPositive()
+  @IsOptional()
+  estadoId: number;
 }

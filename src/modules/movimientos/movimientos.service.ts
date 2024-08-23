@@ -64,7 +64,7 @@ export class MovimientosService {
     id: number,
     updateMovimientoDto: UpdateMovimientoDto,
   ): Promise<HttpException> {
-    console.log(updateMovimientoDto)
+    console.log(updateMovimientoDto);
     const movimientoFound = await this.findOne(id);
 
     // Comparar los valores proporcionados con los valores actuales
@@ -85,6 +85,7 @@ export class MovimientosService {
       'remolcadorId',
       'boxId',
       'puertoId',
+      'estadoId',
     ].some((key) => {
       return (
         updateMovimientoDto[key] &&
@@ -164,6 +165,10 @@ export class MovimientosService {
 
       if (updateMovimientoDto.puertoId) {
         movimientoFound.puertoId = updateMovimientoDto.puertoId;
+      }
+
+      if (updateMovimientoDto.estadoId) {
+        movimientoFound.estadoId = updateMovimientoDto.estadoId;
       }
 
       // Guardar el movimiento con los nuevos valores, disparando los hooks
