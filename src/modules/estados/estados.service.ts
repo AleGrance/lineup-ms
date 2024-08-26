@@ -51,7 +51,7 @@ export class EstadosService {
     console.log(updateEstadoDto);
 
     // Comparar los valores proporcionados con los valores actuales
-    const hasChanges = ['nombre'].some((key) => {
+    const hasChanges = ['nombre', 'class'].some((key) => {
       return updateEstadoDto[key] && updateEstadoDto[key] !== estadoFound[key];
     });
 
@@ -66,6 +66,10 @@ export class EstadosService {
       // Actualizar los valores directamente en el modelo
       if (updateEstadoDto.nombre) {
         estadoFound.nombre = updateEstadoDto.nombre;
+      }
+
+      if (updateEstadoDto.class) {
+        estadoFound.class = updateEstadoDto.class;
       }
 
       // Guardar la estado con los nuevos valores, disparando los hooks

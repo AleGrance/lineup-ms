@@ -11,6 +11,7 @@ import { Barcazas } from 'src/models/barcazas.model';
 import { Remolcadores } from 'src/models/remolcadores.model';
 import { Boxes } from 'src/models/boxes.model';
 import { Puertos } from 'src/models/puertos.model';
+import { Estados } from 'src/models/estados';
 
 @Injectable()
 export class MovimientosService {
@@ -42,7 +43,9 @@ export class MovimientosService {
         { model: Remolcadores, attributes: ['nombre'] },
         { model: Boxes, attributes: ['marca'] },
         { model: Puertos, attributes: ['nombre'] },
+        { model: Estados, attributes: ['nombre', 'class'] },
       ],
+      order: [['horaInicio', 'ASC']]
     });
   }
 

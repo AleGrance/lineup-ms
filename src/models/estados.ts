@@ -17,6 +17,13 @@ export class Estados extends Model<Estados> {
   })
   nombre: string;
 
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    unique: true,
+  })
+  class: string;
+
   // Movimiento
   @HasMany(() => Movimientos)
   movimientos: Movimientos[]
