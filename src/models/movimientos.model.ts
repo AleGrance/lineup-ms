@@ -5,6 +5,7 @@ import {
   DataType,
   ForeignKey,
   BelongsTo,
+  HasMany,
 } from 'sequelize-typescript';
 import { Importadores } from './importadores.model';
 import { Proveedores } from './proveedores.model';
@@ -15,6 +16,7 @@ import { Remolcadores } from './remolcadores.model';
 import { Boxes } from './boxes.model';
 import { Puertos } from './puertos.model';
 import { Estados } from './estados';
+import { Auditorias } from './auditorias';
 
 @Table
 export class Movimientos extends Model<Movimientos> {
@@ -150,4 +152,8 @@ export class Movimientos extends Model<Movimientos> {
 
   @BelongsTo(() => Estados)
   estado: Estados;
+
+  // Auditoria
+  @HasMany(() => Auditorias)
+  auditorias: Auditorias[]
 }

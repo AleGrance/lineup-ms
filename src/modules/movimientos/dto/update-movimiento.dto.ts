@@ -14,4 +14,8 @@ export class UpdateMovimientoDto extends PartialType(CreateMovimientoDto) {
     @IsOptional()
     @IsString()
     urlExpediente?: string;  
+
+    @IsOptional()
+    @IsString()
+    usuarioResponsable?: string;  
 }

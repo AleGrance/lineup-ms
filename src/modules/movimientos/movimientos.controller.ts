@@ -24,7 +24,7 @@ export class MovimientosController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateMovimientoDto: UpdateMovimientoDto) {
-    return this.movimientosService.update(+id, updateMovimientoDto);
+    return this.movimientosService.update(+id, updateMovimientoDto, updateMovimientoDto.usuarioResponsable);
   }
 
   @Delete(':id')

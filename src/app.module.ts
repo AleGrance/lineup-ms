@@ -27,6 +27,9 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { Estados } from './models/estados';
 import { EstadosModule } from './modules/estados/estados.module';
+import { Auditorias } from './models/auditorias';
+import { AuditoriasModule } from './modules/auditorias/auditorias.module';
+import { AuditoriasService } from './modules/auditorias/auditorias.service';
 
 @Module({
   imports: [
@@ -42,7 +45,19 @@ import { EstadosModule } from './modules/estados/estados.module';
       database: process.env.DB_NAME,
       autoLoadModels: true,
       synchronize: true,
-      models: [Productos, Proveedores, Importadores, Buques, Barcazas, Remolcadores, Boxes, Puertos, Movimientos, Estados],
+      models: [
+        Productos,
+        Proveedores,
+        Importadores,
+        Buques,
+        Barcazas,
+        Remolcadores,
+        Boxes,
+        Puertos,
+        Movimientos,
+        Estados,
+        Auditorias,
+      ],
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
@@ -58,6 +73,7 @@ import { EstadosModule } from './modules/estados/estados.module';
     PuertosModule,
     MovimientosModule,
     EstadosModule,
+    AuditoriasModule,
   ],
   controllers: [AppController, UploadController],
   providers: [AppService],

@@ -12,12 +12,14 @@ import { Remolcadores } from 'src/models/remolcadores.model';
 import { Boxes } from 'src/models/boxes.model';
 import { Puertos } from 'src/models/puertos.model';
 import { Estados } from 'src/models/estados';
+import { AuditoriasService } from '../auditorias/auditorias.service';
 
 @Injectable()
 export class MovimientosService {
   constructor(
     @InjectModel(Movimientos)
     private movimientoModel: typeof Movimientos,
+    private auditService: AuditoriasService,
   ) {}
   async create(createMovimientoDto: CreateMovimientoDto) {
     try {
@@ -45,7 +47,7 @@ export class MovimientosService {
         { model: Puertos, attributes: ['nombre'] },
         { model: Estados, attributes: ['nombre', 'class'] },
       ],
-      order: [['horaInicio', 'ASC']]
+      order: [['horaInicio', 'ASC']],
     });
   }
 
@@ -54,6 +56,17 @@ export class MovimientosService {
       where: {
         movimientoId: id,
       },
+      include: [
+        { model: Importadores, attributes: ['razonSocial'] },
+        { model: Proveedores, attributes: ['razonSocial'] },
+        { model: Productos, attributes: ['nombre'] },
+        { model: Buques, attributes: ['nombre'] },
+        { model: Barcazas, attributes: ['nombre'] },
+        { model: Remolcadores, attributes: ['nombre'] },
+        { model: Boxes, attributes: ['marca'] },
+        { model: Puertos, attributes: ['nombre'] },
+        { model: Estados, attributes: ['nombre'] },
+      ],
     });
 
     if (!movimientoFound) {
@@ -66,12 +79,15 @@ export class MovimientosService {
   async update(
     id: number,
     updateMovimientoDto: UpdateMovimientoDto,
+    usuarioResponsable: string, // Identificador del usuario que realiza el cambio
   ): Promise<HttpException> {
-    console.log(updateMovimientoDto);
     const movimientoFound = await this.findOne(id);
+    
+    // console.log('MOVIMIENTO ENCONTRADO', movimientoFound);
+    
 
-    // Comparar los valores proporcionados con los valores actuales
-    const hasChanges = [
+    const changes = [];
+    [
       'cantidad',
       'fechaProbDescarga',
       'fechaArribo',
@@ -89,14 +105,21 @@ export class MovimientosService {
       'boxId',
       'puertoId',
       'estadoId',
-    ].some((key) => {
-      return (
+    ].forEach((key) => {
+      if (
         updateMovimientoDto[key] &&
         updateMovimientoDto[key] !== movimientoFound[key]
-      );
+      ) {
+        changes.push({
+          campoModificado: key,
+          valorAnterior: movimientoFound[key],
+          valorActual: updateMovimientoDto[key],
+        });
+        movimientoFound[key] = updateMovimientoDto[key]; // Actualiza el valor en el objeto movimientoFound
+      }
     });
 
-    if (!hasChanges) {
+    if (changes.length === 0) {
       throw new HttpException(
         'Ningún campo ha cambiado',
         HttpStatus.BAD_REQUEST,
@@ -104,78 +127,18 @@ export class MovimientosService {
     }
 
     try {
-      // Actualizar los valores directamente en el modelo
-      if (updateMovimientoDto.cantidad) {
-        movimientoFound.cantidad = updateMovimientoDto.cantidad;
-      }
-
-      if (updateMovimientoDto.fechaProbDescarga) {
-        movimientoFound.fechaProbDescarga =
-          updateMovimientoDto.fechaProbDescarga;
-      }
-
-      if (updateMovimientoDto.fechaArribo) {
-        movimientoFound.fechaArribo = updateMovimientoDto.fechaArribo;
-      }
-
-      if (updateMovimientoDto.horaInicio) {
-        movimientoFound.horaInicio = updateMovimientoDto.horaInicio;
-      }
-
-      if (updateMovimientoDto.horaFin) {
-        movimientoFound.horaFin = updateMovimientoDto.horaFin;
-      }
-
-      if (updateMovimientoDto.urlManifiesto) {
-        movimientoFound.urlManifiesto = updateMovimientoDto.urlManifiesto;
-      }
-
-      if (updateMovimientoDto.urlBL) {
-        movimientoFound.urlBL = updateMovimientoDto.urlBL;
-      }
-
-      if (updateMovimientoDto.urlExpediente) {
-        movimientoFound.urlExpediente = updateMovimientoDto.urlExpediente;
-      }
-
-      if (updateMovimientoDto.importadorId) {
-        movimientoFound.importadorId = updateMovimientoDto.importadorId;
-      }
-
-      if (updateMovimientoDto.proveedorId) {
-        movimientoFound.proveedorId = updateMovimientoDto.proveedorId;
-      }
-
-      if (updateMovimientoDto.productoId) {
-        movimientoFound.productoId = updateMovimientoDto.productoId;
-      }
-
-      if (updateMovimientoDto.buqueId) {
-        movimientoFound.buqueId = updateMovimientoDto.buqueId;
-      }
-
-      if (updateMovimientoDto.barcazaId) {
-        movimientoFound.barcazaId = updateMovimientoDto.barcazaId;
-      }
-
-      if (updateMovimientoDto.remolcadorId) {
-        movimientoFound.remolcadorId = updateMovimientoDto.remolcadorId;
-      }
-
-      if (updateMovimientoDto.boxId) {
-        movimientoFound.boxId = updateMovimientoDto.boxId;
-      }
-
-      if (updateMovimientoDto.puertoId) {
-        movimientoFound.puertoId = updateMovimientoDto.puertoId;
-      }
-
-      if (updateMovimientoDto.estadoId) {
-        movimientoFound.estadoId = updateMovimientoDto.estadoId;
-      }
-
-      // Guardar el movimiento con los nuevos valores, disparando los hooks
       await movimientoFound.save();
+
+      for (const change of changes) {
+        const createAuditoriaDto = {
+          campoModificado: change.campoModificado,
+          valorAnterior: change.valorAnterior,
+          valorActual: change.valorActual,
+          usuarioResponsable,
+          movimientoId: id,
+        };
+        await this.auditService.create(createAuditoriaDto);
+      }
 
       return new HttpException(
         'Movimiento actualizado correctamente',
