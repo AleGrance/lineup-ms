@@ -75,6 +75,12 @@ export class Movimientos extends Model<Movimientos> {
   })
   urlExpediente: string;
 
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  usuarioCreador: string;
+
   /**
    *  RELATIONS
    */

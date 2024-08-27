@@ -82,9 +82,8 @@ export class MovimientosService {
     usuarioResponsable: string, // Identificador del usuario que realiza el cambio
   ): Promise<HttpException> {
     const movimientoFound = await this.findOne(id);
-    
+
     // console.log('MOVIMIENTO ENCONTRADO', movimientoFound);
-    
 
     const changes = [];
     [

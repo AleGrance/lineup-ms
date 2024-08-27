@@ -65,4 +65,8 @@ export class CreateMovimientoDto {
   @IsPositive()
   @IsOptional()
   estadoId: number;
+
+  @IsString()
+  @IsOptional()
+  usuarioCreador: string;
 }
