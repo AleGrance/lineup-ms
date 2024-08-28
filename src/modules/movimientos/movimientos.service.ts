@@ -105,18 +105,39 @@ export class MovimientosService {
       'puertoId',
       'estadoId',
     ].forEach((key) => {
-      if (
-        updateMovimientoDto[key] &&
-        updateMovimientoDto[key] !== movimientoFound[key]
-      ) {
-        changes.push({
-          campoModificado: key,
-          valorAnterior: movimientoFound[key],
-          valorActual: updateMovimientoDto[key],
-        });
-        movimientoFound[key] = updateMovimientoDto[key]; // Actualiza el valor en el objeto movimientoFound
+
+      // Para el campo cantidad se valida cambiando el formato del valor porque al comparar entre entornos genera diferencias por
+      // mas que no exista por ej: 2000 vs 2000.000
+      if (key == 'cantidad') {
+
+        // console.log('Anterior', movimientoFound[key].toString());
+        // console.log('Actual', updateMovimientoDto[key].toFixed(3));
+
+        if (updateMovimientoDto[key] && updateMovimientoDto[key].toFixed(3) !== movimientoFound[key].toString()) {
+          changes.push({
+            campoModificado: key,
+            valorAnterior: movimientoFound[key],
+            valorActual: updateMovimientoDto[key].toFixed(3),
+          });
+          movimientoFound[key] = updateMovimientoDto[key]; // Actualiza el valor en el objeto movimientoFound
+        }
+        
+      } else {
+        if (updateMovimientoDto[key] && updateMovimientoDto[key] !== movimientoFound[key]) {
+          changes.push({
+            campoModificado: key,
+            valorAnterior: movimientoFound[key],
+            valorActual: updateMovimientoDto[key],
+          });
+          movimientoFound[key] = updateMovimientoDto[key]; // Actualiza el valor en el objeto movimientoFound
+        }
       }
+
+        
+      
     });
+
+
 
     if (changes.length === 0) {
       throw new HttpException(

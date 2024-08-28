@@ -28,7 +28,7 @@ export class Movimientos extends Model<Movimientos> {
   movimientoId: number;
 
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.DECIMAL(10, 3),
     allowNull: false,
   })
   cantidad: number;
