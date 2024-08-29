@@ -24,7 +24,9 @@ export class ProductosService {
   }
 
   async findAll(): Promise<Productos[]> {
-    return this.productoModel.findAll();
+    return this.productoModel.findAll({
+      order: [['nombre', 'ASC']]
+    });
   }
 
   async findOne(id: number): Promise<Productos> {

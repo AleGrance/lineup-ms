@@ -1,10 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
+  const logger = new Logger('MS-003 Lineup');
+
   const app = await NestFactory.create(AppModule);
+
+  const port = process.env.PORT;
 
   app.use(bodyParser.json({ limit: '50mb' }));
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
@@ -27,12 +31,15 @@ async function bootstrap() {
   
   // Habilitar CORS
   app.enableCors({
-    origin: 'http://localhost:4200', // Reemplaza esto con la URL de tu frontend
+    origin: 'http://10.10.110.2:5000', // Reemplaza esto con la URL de tu frontend
+    // origin: 'http://localhost:4200', // Reemplaza esto con la URL de tu frontend
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: ['Content-Type', 'Authorization', 'apikey'],
     credentials: true,
   });
 
-  await app.listen(3002);
+  await app.listen(port);
+
+  logger.log(`Server listen on port ${port}`);
 }
 bootstrap();

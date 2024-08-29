@@ -13,6 +13,8 @@ import { Boxes } from 'src/models/boxes.model';
 import { Puertos } from 'src/models/puertos.model';
 import { Estados } from 'src/models/estados';
 import { AuditoriasService } from '../auditorias/auditorias.service';
+import { FiltroMovimientoDto } from './dto/filtro-movimiento.dto';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class MovimientosService {
@@ -171,5 +173,44 @@ export class MovimientosService {
 
   remove(id: number) {
     return `This action removes a #${id} movimiento`;
+  }
+
+  /**
+   * Filtro por parámetros
+   * @param productoId
+   * @param proveedorId
+   * @param importadorId
+   * @param fechaDesde
+   * @param fechaHasta
+   */
+
+  async filtrarMovimientos(filtroMovimientoDto: FiltroMovimientoDto): Promise<Movimientos[]> {
+    const { productoId, proveedorId, importadorId, buqueId, estadoId, fechaDesde, fechaHasta } = filtroMovimientoDto;
+
+    const whereClause: any = {};
+
+    if (productoId) whereClause.productoId = productoId;
+    if (proveedorId) whereClause.proveedorId = proveedorId;
+    if (importadorId) whereClause.importadorId = importadorId;
+    if (buqueId) whereClause.buqueId = buqueId;
+    if (estadoId) whereClause.estadoId = estadoId;
+    if (fechaDesde) whereClause.fechaProbDescarga = { [Op.between]: [fechaDesde, fechaHasta] };
+    // if (fechaHasta) whereClause.fechaProbDescarga = { [Op.lte]: fechaHasta };
+
+    return this.movimientoModel.findAll({
+      where: whereClause,
+      include: [
+        { model: Importadores, attributes: ['razonSocial'] },
+        { model: Proveedores, attributes: ['razonSocial'] },
+        { model: Productos, attributes: ['nombre'] },
+        { model: Buques, attributes: ['nombre'] },
+        { model: Barcazas, attributes: ['nombre'] },
+        { model: Remolcadores, attributes: ['nombre'] },
+        { model: Boxes, attributes: ['marca'] },
+        { model: Puertos, attributes: ['nombre'] },
+        { model: Estados, attributes: ['nombre', 'class'] },
+      ],
+      order: [['horaInicio', 'ASC']],
+    });
   }
 }

@@ -25,7 +25,9 @@ export class BarcazasService {
   }
 
   async findAll(): Promise<Barcazas[]> {
-    return this.barcazaModel.findAll();
+    return this.barcazaModel.findAll({
+      order: [['nombre', 'ASC']]
+    });
   }
 
   async findOne(id: number): Promise<Barcazas> {

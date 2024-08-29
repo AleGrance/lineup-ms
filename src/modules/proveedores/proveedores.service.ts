@@ -25,7 +25,9 @@ export class ProveedoresService {
   }
 
   async findAll(): Promise<Proveedores[]> {
-    return this.proveedorModel.findAll();
+    return this.proveedorModel.findAll({
+      order: [['razonSocial', 'ASC']]
+    });
   }
 
   async findOne(id: number): Promise<Proveedores> {

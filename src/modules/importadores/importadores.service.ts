@@ -25,7 +25,9 @@ export class ImportadoresService {
   }
 
   async findAll(): Promise<Importadores[]> {
-    return this.importadorModel.findAll();
+    return this.importadorModel.findAll({
+      order: [['razonSocial', 'ASC']],
+    });
   }
 
   async findOne(id: number): Promise<Importadores> {

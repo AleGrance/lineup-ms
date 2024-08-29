@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { MovimientosService } from './movimientos.service';
 import { CreateMovimientoDto } from './dto/create-movimiento.dto';
 import { UpdateMovimientoDto } from './dto/update-movimiento.dto';
+import { FiltroMovimientoDto } from './dto/filtro-movimiento.dto';
 
 @Controller('movimientos')
 export class MovimientosController {
@@ -30,5 +31,14 @@ export class MovimientosController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.movimientosService.remove(+id);
+  }
+
+  /**
+   * Filtro
+   */
+
+  @Post('filtrados')
+  filtrarMovimientos(@Body() filtroMovimientoDto: FiltroMovimientoDto) {
+    return this.movimientosService.filtrarMovimientos(filtroMovimientoDto);
   }
 }

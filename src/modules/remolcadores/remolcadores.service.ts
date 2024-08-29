@@ -25,7 +25,9 @@ export class RemolcadoresService {
   }
 
   async findAll(): Promise<Remolcadores[]> {
-    return this.remolcadorModel.findAll();
+    return this.remolcadorModel.findAll({
+      order: [['nombre', 'ASC']]
+    });
   }
 
   async findOne(id: number): Promise<Remolcadores> {
