@@ -5,7 +5,6 @@ import { ProductosModule } from './modules/productos/productos.module';
 import { ProveedoresModule } from './modules/proveedores/proveedores.module';
 import { ImportadoresModule } from './modules/importadores/importadores.module';
 import { BuquesModule } from './modules/buques/buques.module';
-import { BarcazasModule } from './modules/barcazas/barcazas.module';
 import { RemolcadoresModule } from './modules/remolcadores/remolcadores.module';
 import { BoxesModule } from './modules/boxes/boxes.module';
 import { PuertosModule } from './modules/puertos/puertos.module';
@@ -17,7 +16,6 @@ import { Productos } from './models/productos.model';
 import { Proveedores } from './models/proveedores.model';
 import { Importadores } from './models/importadores.model';
 import { Buques } from './models/buques.model';
-import { Barcazas } from './models/barcazas.model';
 import { Remolcadores } from './models/remolcadores.model';
 import { Boxes } from './models/boxes.model';
 import { Puertos } from './models/puertos.model';
@@ -29,7 +27,8 @@ import { Estados } from './models/estados';
 import { EstadosModule } from './modules/estados/estados.module';
 import { Auditorias } from './models/auditorias';
 import { AuditoriasModule } from './modules/auditorias/auditorias.module';
-import { AuditoriasService } from './modules/auditorias/auditorias.service';
+import { Navieras } from './models/navieras';
+import { NavierasModule } from './modules/navieras/navieras.module';
 
 @Module({
   imports: [
@@ -50,7 +49,7 @@ import { AuditoriasService } from './modules/auditorias/auditorias.service';
         Proveedores,
         Importadores,
         Buques,
-        Barcazas,
+        Navieras,
         Remolcadores,
         Boxes,
         Puertos,
@@ -67,13 +66,13 @@ import { AuditoriasService } from './modules/auditorias/auditorias.service';
     ProveedoresModule,
     ImportadoresModule,
     BuquesModule,
-    BarcazasModule,
     RemolcadoresModule,
     BoxesModule,
     PuertosModule,
     MovimientosModule,
     EstadosModule,
     AuditoriasModule,
+    NavierasModule,
   ],
   controllers: [AppController, UploadController],
   providers: [AppService],

@@ -26,6 +26,9 @@ export class CreateMovimientoDto {
   @IsNotEmpty()
   horaFin: Date;
 
+  @IsNotEmpty()
+  barcaza: string;
+
   /**
    *  RELATIONS
    */
@@ -48,7 +51,7 @@ export class CreateMovimientoDto {
 
   @IsPositive()
   @IsNotEmpty()
-  barcazaId: number;
+  navieraId: number;
 
   @IsPositive()
   @IsNotEmpty()

@@ -7,7 +7,6 @@ import { Importadores } from 'src/models/importadores.model';
 import { Proveedores } from 'src/models/proveedores.model';
 import { Productos } from 'src/models/productos.model';
 import { Buques } from 'src/models/buques.model';
-import { Barcazas } from 'src/models/barcazas.model';
 import { Remolcadores } from 'src/models/remolcadores.model';
 import { Boxes } from 'src/models/boxes.model';
 import { Puertos } from 'src/models/puertos.model';
@@ -15,6 +14,9 @@ import { Estados } from 'src/models/estados';
 import { AuditoriasService } from '../auditorias/auditorias.service';
 import { FiltroMovimientoDto } from './dto/filtro-movimiento.dto';
 import { Op } from 'sequelize';
+import { Navieras } from 'src/models/navieras';
+import { PaginationMovimientoDto } from './dto/pagination-movimiento.dto';
+import { PaginatedMovimientoDto } from './dto/paginated-movimiento.dto';
 
 @Injectable()
 export class MovimientosService {
@@ -32,6 +34,8 @@ export class MovimientosService {
           'El nombre ingresado ya existe',
           HttpStatus.BAD_REQUEST,
         );
+      } else {
+        return error;
       }
     }
   }
@@ -43,7 +47,7 @@ export class MovimientosService {
         { model: Proveedores, attributes: ['razonSocial'] },
         { model: Productos, attributes: ['nombre'] },
         { model: Buques, attributes: ['nombre'] },
-        { model: Barcazas, attributes: ['nombre'] },
+        { model: Navieras, attributes: ['nombre'] },
         { model: Remolcadores, attributes: ['nombre'] },
         { model: Boxes, attributes: ['marca'] },
         { model: Puertos, attributes: ['nombre'] },
@@ -63,7 +67,7 @@ export class MovimientosService {
         { model: Proveedores, attributes: ['razonSocial'] },
         { model: Productos, attributes: ['nombre'] },
         { model: Buques, attributes: ['nombre'] },
-        { model: Barcazas, attributes: ['nombre'] },
+        { model: Navieras, attributes: ['nombre'] },
         { model: Remolcadores, attributes: ['nombre'] },
         { model: Boxes, attributes: ['marca'] },
         { model: Puertos, attributes: ['nombre'] },
@@ -94,6 +98,7 @@ export class MovimientosService {
       'fechaArribo',
       'horaInicio',
       'horaFin',
+      'barcaza',
       'urlManifiesto',
       'urlBL',
       'urlExpediente',
@@ -101,21 +106,23 @@ export class MovimientosService {
       'proveedorId',
       'productoId',
       'buqueId',
-      'barcazaId',
+      'navieraId',
       'remolcadorId',
       'boxId',
       'puertoId',
       'estadoId',
     ].forEach((key) => {
-
       // Para el campo cantidad se valida cambiando el formato del valor porque al comparar entre entornos genera diferencias por
       // mas que no exista por ej: 2000 vs 2000.000
       if (key == 'cantidad') {
-
         // console.log('Anterior', movimientoFound[key].toString());
         // console.log('Actual', updateMovimientoDto[key].toFixed(3));
 
-        if (updateMovimientoDto[key] && updateMovimientoDto[key].toFixed(3) !== movimientoFound[key].toString()) {
+        if (
+          updateMovimientoDto[key] &&
+          updateMovimientoDto[key].toFixed(3) !==
+            movimientoFound[key].toString()
+        ) {
           changes.push({
             campoModificado: key,
             valorAnterior: movimientoFound[key],
@@ -123,9 +130,11 @@ export class MovimientosService {
           });
           movimientoFound[key] = updateMovimientoDto[key]; // Actualiza el valor en el objeto movimientoFound
         }
-        
       } else {
-        if (updateMovimientoDto[key] && updateMovimientoDto[key] !== movimientoFound[key]) {
+        if (
+          updateMovimientoDto[key] &&
+          updateMovimientoDto[key] !== movimientoFound[key]
+        ) {
           changes.push({
             campoModificado: key,
             valorAnterior: movimientoFound[key],
@@ -134,12 +143,7 @@ export class MovimientosService {
           movimientoFound[key] = updateMovimientoDto[key]; // Actualiza el valor en el objeto movimientoFound
         }
       }
-
-        
-      
     });
-
-
 
     if (changes.length === 0) {
       throw new HttpException(
@@ -176,7 +180,7 @@ export class MovimientosService {
   }
 
   /**
-   * Filtro por parámetros
+   * Filtro de busqueda por parámetros
    * @param productoId
    * @param proveedorId
    * @param importadorId
@@ -184,8 +188,18 @@ export class MovimientosService {
    * @param fechaHasta
    */
 
-  async filtrarMovimientos(filtroMovimientoDto: FiltroMovimientoDto): Promise<Movimientos[]> {
-    const { productoId, proveedorId, importadorId, buqueId, estadoId, fechaDesde, fechaHasta } = filtroMovimientoDto;
+  async filtrarMovimientos(
+    filtroMovimientoDto: FiltroMovimientoDto,
+  ): Promise<Movimientos[]> {
+    const {
+      productoId,
+      proveedorId,
+      importadorId,
+      buqueId,
+      estadoId,
+      fechaDesde,
+      fechaHasta,
+    } = filtroMovimientoDto;
 
     const whereClause: any = {};
 
@@ -194,7 +208,10 @@ export class MovimientosService {
     if (importadorId) whereClause.importadorId = importadorId;
     if (buqueId) whereClause.buqueId = buqueId;
     if (estadoId) whereClause.estadoId = estadoId;
-    if (fechaDesde) whereClause.fechaProbDescarga = { [Op.between]: [fechaDesde, fechaHasta] };
+    if (fechaDesde)
+      whereClause.fechaProbDescarga = {
+        [Op.between]: [fechaDesde, fechaHasta],
+      };
     // if (fechaHasta) whereClause.fechaProbDescarga = { [Op.lte]: fechaHasta };
 
     return this.movimientoModel.findAll({
@@ -204,7 +221,7 @@ export class MovimientosService {
         { model: Proveedores, attributes: ['razonSocial'] },
         { model: Productos, attributes: ['nombre'] },
         { model: Buques, attributes: ['nombre'] },
-        { model: Barcazas, attributes: ['nombre'] },
+        { model: Navieras, attributes: ['nombre'] },
         { model: Remolcadores, attributes: ['nombre'] },
         { model: Boxes, attributes: ['marca'] },
         { model: Puertos, attributes: ['nombre'] },
@@ -212,5 +229,65 @@ export class MovimientosService {
       ],
       order: [['horaInicio', 'ASC']],
     });
+  }
+
+  /**
+   * Paginación
+   */
+
+  // PAGINADO DE PRODUCTOS
+  async getMovimientosPaginados(
+    paginationMovimientoDto: PaginationMovimientoDto,
+  ): Promise<PaginatedMovimientoDto> {
+    try {
+      const counts = await this.movimientoModel.count();
+
+      var result = {
+        data: [],
+        recordsTotal: 0,
+        recordsFiltered: 0,
+      };
+
+      if (!counts) {
+        return result;
+      }
+
+      result.recordsTotal = counts;
+
+      // Aquí se utiliza el índice de la columna directamente
+      // const orderColumnIndex = paginationMovimientoDto.order[0].name;
+      // const orderDirection = paginationMovimientoDto.order[0].dir || 'asc';
+
+      // console.log(orderColumnIndex, orderDirection);
+
+      const response = await this.movimientoModel.findAndCountAll({
+        offset: paginationMovimientoDto.start,
+        limit: paginationMovimientoDto.length,
+        // order: [['buque.nombre', 'asc']],
+        // order: [
+        //   [{ model: Buques, as: 'buque' }, 'nombre', paginationMovimientoDto.order[0].dir || 'asc']
+        // ],
+        // order: ['Buque', 'nombre', 'DESC'],
+
+        include: [
+          { model: Importadores, attributes: ['razonSocial'] },
+          { model: Proveedores, attributes: ['razonSocial'] },
+          { model: Productos, attributes: ['nombre'] },
+          { model: Buques, attributes: ['nombre'] },
+          { model: Navieras, attributes: ['nombre'] },
+          { model: Remolcadores, attributes: ['nombre'] },
+          { model: Boxes, attributes: ['marca'] },
+          { model: Puertos, attributes: ['nombre'] },
+          { model: Estados, attributes: ['nombre'] },
+        ],
+      });
+
+      result.recordsFiltered = response.count;
+      result.data = response.rows;
+      return result;
+    } catch (error) {
+      console.error(error);
+      return error;
+    }
   }
 }

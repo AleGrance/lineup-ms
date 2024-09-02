@@ -14,12 +14,14 @@ async function bootstrap() {
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
   /**
-   * Usar las validaciones que se describen en los dtos para todos los modulos del proyecto 
+   * Usar las validaciones que se describen en los dtos para todos los modulos del proyecto
    * whitelist: true para evitar que se agreguen campos que no se estan esperando
    */
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+    }),
+  );
 
   // Se agrega el prefijo api/
   app.setGlobalPrefix('api');
@@ -28,11 +30,10 @@ async function bootstrap() {
    * Enable cors
    */
   // app.enableCors();
-  
+
   // Habilitar CORS
   app.enableCors({
-    origin: 'http://10.10.110.2:5000', // Reemplaza esto con la URL de tu frontend
-    // origin: 'http://localhost:4200', // Reemplaza esto con la URL de tu frontend
+    // origin: 'http://10.10.110.2:5000', // Reemplaza esto con la URL de tu frontend
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: ['Content-Type', 'Authorization', 'apikey'],
     credentials: true,

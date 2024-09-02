@@ -11,12 +11,12 @@ import { Importadores } from './importadores.model';
 import { Proveedores } from './proveedores.model';
 import { Productos } from './productos.model';
 import { Buques } from './buques.model';
-import { Barcazas } from './barcazas.model';
 import { Remolcadores } from './remolcadores.model';
 import { Boxes } from './boxes.model';
 import { Puertos } from './puertos.model';
 import { Estados } from './estados';
 import { Auditorias } from './auditorias';
+import { Navieras } from './navieras';
 
 @Table
 export class Movimientos extends Model<Movimientos> {
@@ -81,6 +81,12 @@ export class Movimientos extends Model<Movimientos> {
   })
   usuarioCreador: string;
 
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  barcaza: string;
+
   /**
    *  RELATIONS
    */
@@ -117,13 +123,13 @@ export class Movimientos extends Model<Movimientos> {
   @BelongsTo(() => Buques)
   buque: Buques;
 
-  // Barcaza
-  @ForeignKey(() => Barcazas)
+  // Naviera
+  @ForeignKey(() => Navieras)
   @Column
-  barcazaId: number;
+  navieraId: number;
 
-  @BelongsTo(() => Barcazas)
-  barcaza: Barcazas;
+  @BelongsTo(() => Navieras)
+  naviera: Navieras;
 
   // Remolcador
   @ForeignKey(() => Remolcadores)

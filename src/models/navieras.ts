@@ -2,13 +2,13 @@ import { Column, Model, Table, DataType, HasMany } from 'sequelize-typescript';
 import { Movimientos } from './movimientos.model';
 
 @Table
-export class Barcazas extends Model<Barcazas> {
+export class Navieras extends Model<Navieras> {
   @Column({
     type: DataType.INTEGER,
     autoIncrement: true,
     primaryKey: true,
   })
-  barcazaId: number;
+  navieraId: number;
 
   @Column({
     type: DataType.STRING,

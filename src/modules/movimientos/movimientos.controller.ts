@@ -3,6 +3,7 @@ import { MovimientosService } from './movimientos.service';
 import { CreateMovimientoDto } from './dto/create-movimiento.dto';
 import { UpdateMovimientoDto } from './dto/update-movimiento.dto';
 import { FiltroMovimientoDto } from './dto/filtro-movimiento.dto';
+import { PaginationMovimientoDto } from './dto/pagination-movimiento.dto';
 
 @Controller('movimientos')
 export class MovimientosController {
@@ -40,5 +41,14 @@ export class MovimientosController {
   @Post('filtrados')
   filtrarMovimientos(@Body() filtroMovimientoDto: FiltroMovimientoDto) {
     return this.movimientosService.filtrarMovimientos(filtroMovimientoDto);
+  }
+
+  /**
+   * Paginacion
+   */
+  @Post('paginados')
+  getMovimientosPaginados(@Body() paginationMovimientoDto: PaginationMovimientoDto) {
+    console.log(paginationMovimientoDto);
+    return this.movimientosService.getMovimientosPaginados(paginationMovimientoDto);
   }
 }
