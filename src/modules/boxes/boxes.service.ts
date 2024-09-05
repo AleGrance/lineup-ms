@@ -46,7 +46,7 @@ export class BoxesService {
     const boxFound = await this.findOne(id);
 
     // Comparar los valores proporcionados con los valores actuales
-    const hasChanges = ['capacidad', 'marca'].some((key) => {
+    const hasChanges = ['numeracion', 'nombre'].some((key) => {
       return updateBoxDto[key] && updateBoxDto[key] !== boxFound[key];
     });
 
@@ -59,11 +59,11 @@ export class BoxesService {
 
     try {
       // Actualizar los valores directamente en el modelo
-      if (updateBoxDto.capacidad) {
-        boxFound.capacidad = updateBoxDto.capacidad;
+      if (updateBoxDto.numeracion) {
+        boxFound.numeracion = updateBoxDto.numeracion;
       }
-      if (updateBoxDto.marca) {
-        boxFound.marca = updateBoxDto.marca;
+      if (updateBoxDto.nombre) {
+        boxFound.nombre = updateBoxDto.nombre;
       }
 
       // Guardar el box con los nuevos valores, disparando los hooks

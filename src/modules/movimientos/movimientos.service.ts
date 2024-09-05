@@ -17,6 +17,7 @@ import { Op } from 'sequelize';
 import { Navieras } from 'src/models/navieras';
 import { PaginationMovimientoDto } from './dto/pagination-movimiento.dto';
 import { PaginatedMovimientoDto } from './dto/paginated-movimiento.dto';
+import * as moment from 'moment';
 
 @Injectable()
 export class MovimientosService {
@@ -49,11 +50,11 @@ export class MovimientosService {
         { model: Buques, attributes: ['nombre'] },
         { model: Navieras, attributes: ['nombre'] },
         { model: Remolcadores, attributes: ['nombre'] },
-        { model: Boxes, attributes: ['marca'] },
+        { model: Boxes, attributes: ['nombre'] },
         { model: Puertos, attributes: ['nombre'] },
         { model: Estados, attributes: ['nombre', 'class'] },
       ],
-      order: [['horaInicio', 'ASC']],
+      order: [['createdAt', 'ASC']],
     });
   }
 
@@ -69,7 +70,7 @@ export class MovimientosService {
         { model: Buques, attributes: ['nombre'] },
         { model: Navieras, attributes: ['nombre'] },
         { model: Remolcadores, attributes: ['nombre'] },
-        { model: Boxes, attributes: ['marca'] },
+        { model: Boxes, attributes: ['nombre'] },
         { model: Puertos, attributes: ['nombre'] },
         { model: Estados, attributes: ['nombre'] },
       ],
@@ -223,11 +224,11 @@ export class MovimientosService {
         { model: Buques, attributes: ['nombre'] },
         { model: Navieras, attributes: ['nombre'] },
         { model: Remolcadores, attributes: ['nombre'] },
-        { model: Boxes, attributes: ['marca'] },
+        { model: Boxes, attributes: ['nombre'] },
         { model: Puertos, attributes: ['nombre'] },
         { model: Estados, attributes: ['nombre', 'class'] },
       ],
-      order: [['horaInicio', 'ASC']],
+      order: [['createdAt', 'ASC']],
     });
   }
 
@@ -255,19 +256,22 @@ export class MovimientosService {
       result.recordsTotal = counts;
 
       // Aquí se utiliza el índice de la columna directamente
-      // const orderColumnIndex = paginationMovimientoDto.order[0].name;
-      // const orderDirection = paginationMovimientoDto.order[0].dir || 'asc';
+      let [tabla, campo] = '';
+      let orderDirection = '';
 
-      // console.log(orderColumnIndex, orderDirection);
+      if (paginationMovimientoDto.order.length > 0) {
+        [tabla, campo] = paginationMovimientoDto.order[0].name.split('.');
+        orderDirection = paginationMovimientoDto.order[0].dir || 'asc';
+
+        console.log(tabla, campo, orderDirection);
+      }
 
       const response = await this.movimientoModel.findAndCountAll({
         offset: paginationMovimientoDto.start,
         limit: paginationMovimientoDto.length,
-        // order: [['buque.nombre', 'asc']],
-        // order: [
-        //   [{ model: Buques, as: 'buque' }, 'nombre', paginationMovimientoDto.order[0].dir || 'asc']
-        // ],
-        // order: ['Buque', 'nombre', 'DESC'],
+        order: !paginationMovimientoDto.order[0]
+          ? []
+          : [[tabla, campo, orderDirection]],
 
         include: [
           { model: Importadores, attributes: ['razonSocial'] },
@@ -276,7 +280,7 @@ export class MovimientosService {
           { model: Buques, attributes: ['nombre'] },
           { model: Navieras, attributes: ['nombre'] },
           { model: Remolcadores, attributes: ['nombre'] },
-          { model: Boxes, attributes: ['marca'] },
+          { model: Boxes, attributes: ['nombre'] },
           { model: Puertos, attributes: ['nombre'] },
           { model: Estados, attributes: ['nombre'] },
         ],
@@ -289,5 +293,44 @@ export class MovimientosService {
       console.error(error);
       return error;
     }
+  }
+
+  /**
+   * Reporte en linea
+   */
+
+  async getMovimientosLinea(): Promise<Movimientos[]> {
+    console.log('movimientos en linea');
+    
+    const hoy = new Date();
+
+    const primerDiaMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+
+    const primerDiaMesFormated = moment(primerDiaMes, 'yyyy-MM-dd');
+    const hoyFormated = moment(hoy, 'yyyy-MM-dd');
+
+    // Sumar 15 días a la fecha de hoy
+    const fechaMas15Dias = hoyFormated.add(15, 'days');
+
+    return this.movimientoModel.findAll({
+      where: {
+        fechaProbDescarga: {
+          [Op.between]: [primerDiaMesFormated, fechaMas15Dias],
+        },
+        horaInicio: { [Op.not]: null }
+      },
+      include: [
+        { model: Importadores, attributes: ['razonSocial'] },
+        { model: Proveedores, attributes: ['razonSocial'] },
+        { model: Productos, attributes: ['nombre'] },
+        { model: Buques, attributes: ['nombre'] },
+        { model: Navieras, attributes: ['nombre'] },
+        { model: Remolcadores, attributes: ['nombre'] },
+        { model: Boxes, attributes: ['nombre'] },
+        { model: Puertos, attributes: ['nombre'] },
+        { model: Estados, attributes: ['nombre', 'class'] },
+      ],
+      order: [['createdAt', 'ASC']],
+    });
   }
 }

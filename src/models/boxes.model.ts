@@ -14,13 +14,13 @@ export class Boxes extends Model<Boxes> {
     type: DataType.INTEGER,
     allowNull: false,
   })
-  capacidad: number;
+  numeracion: number;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-  marca: string;
+  nombre: string;
 
   // Movimiento
   @HasMany(() => Movimientos)

@@ -20,10 +20,10 @@ export class CreateMovimientoDto {
   @IsDateString()
   fechaArribo: Date;
 
-  @IsNotEmpty()
+  @IsOptional()
   horaInicio: Date;
 
-  @IsNotEmpty()
+  @IsOptional()
   horaFin: Date;
 
   @IsNotEmpty()

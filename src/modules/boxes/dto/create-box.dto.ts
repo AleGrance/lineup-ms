@@ -3,9 +3,9 @@ import { IsNotEmpty, IsPositive, IsString } from 'class-validator';
 export class CreateBoxDto {
   @IsPositive()
   @IsNotEmpty()
-  capacidad: number;
+  numeracion: number;
 
   @IsString()
   @IsNotEmpty()
-  marca: string;
+  nombre: string;
 }
