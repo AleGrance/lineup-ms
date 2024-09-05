@@ -54,7 +54,7 @@ export class MovimientosService {
         { model: Puertos, attributes: ['nombre'] },
         { model: Estados, attributes: ['nombre', 'class'] },
       ],
-      order: [['createdAt', 'ASC']],
+      order: [['fechaProbDescarga', 'ASC'], ['horaInicio', 'ASC']],
     });
   }
 
@@ -228,7 +228,7 @@ export class MovimientosService {
         { model: Puertos, attributes: ['nombre'] },
         { model: Estados, attributes: ['nombre', 'class'] },
       ],
-      order: [['createdAt', 'ASC']],
+      order: [['fechaProbDescarga', 'ASC'],['horaInicio', 'ASC']],
     });
   }
 
@@ -330,7 +330,7 @@ export class MovimientosService {
         { model: Puertos, attributes: ['nombre'] },
         { model: Estados, attributes: ['nombre', 'class'] },
       ],
-      order: [['createdAt', 'ASC']],
+      order: [['fechaProbDescarga', 'ASC'], ['horaInicio', 'ASC']],
     });
   }
 }
