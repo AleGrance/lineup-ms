@@ -28,6 +28,18 @@ export class MovimientosController {
     return this.movimientosService.findAll();
   }
 
+  @Patch('removeFile/:id')
+  removeFile(
+    @Param('id') id: string,
+    @Body() body: any,
+  ) {
+    return this.movimientosService.removeFile(
+      +id,
+      body,
+      body.usuarioResponsable,
+    );
+  }
+
   @Patch(':id')
   update(
     @Param('id') id: string,

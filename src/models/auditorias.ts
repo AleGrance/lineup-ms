@@ -25,13 +25,13 @@ export class Auditorias extends Model<Auditorias> {
 
   @Column({
     type: DataType.STRING,
-    allowNull: false,
+    allowNull: true,
   })
   valorAnterior: string;
 
   @Column({
     type: DataType.STRING,
-    allowNull: false,
+    allowNull: true,
   })
   valorActual: string;
 

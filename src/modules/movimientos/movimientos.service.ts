@@ -18,6 +18,8 @@ import { Navieras } from 'src/models/navieras';
 import { PaginationMovimientoDto } from './dto/pagination-movimiento.dto';
 import { PaginatedMovimientoDto } from './dto/paginated-movimiento.dto';
 import * as moment from 'moment';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class MovimientosService {
@@ -54,7 +56,10 @@ export class MovimientosService {
         { model: Puertos, attributes: ['nombre'] },
         { model: Estados, attributes: ['nombre', 'class'] },
       ],
-      order: [['fechaProbDescarga', 'ASC'], ['horaInicio', 'ASC']],
+      order: [
+        ['fechaProbDescarga', 'ASC'],
+        ['horaInicio', 'ASC'],
+      ],
     });
   }
 
@@ -90,9 +95,8 @@ export class MovimientosService {
   ): Promise<HttpException> {
     const movimientoFound = await this.findOne(id);
 
-    // console.log('MOVIMIENTO ENCONTRADO', movimientoFound);
+    let changes = [];
 
-    const changes = [];
     [
       'cantidad',
       'fechaProbDescarga',
@@ -113,17 +117,11 @@ export class MovimientosService {
       'puertoId',
       'estadoId',
     ].forEach((key) => {
+
       // Para el campo cantidad se valida cambiando el formato del valor porque al comparar entre entornos genera diferencias por
       // mas que no exista por ej: 2000 vs 2000.000
       if (key == 'cantidad') {
-        // console.log('Anterior', movimientoFound[key].toString());
-        // console.log('Actual', updateMovimientoDto[key].toFixed(3));
-
-        if (
-          updateMovimientoDto[key] &&
-          updateMovimientoDto[key].toFixed(3) !==
-            movimientoFound[key].toString()
-        ) {
+        if (updateMovimientoDto[key] && updateMovimientoDto[key].toFixed(3) !== movimientoFound[key].toString()) {
           changes.push({
             campoModificado: key,
             valorAnterior: movimientoFound[key],
@@ -131,11 +129,38 @@ export class MovimientosService {
           });
           movimientoFound[key] = updateMovimientoDto[key]; // Actualiza el valor en el objeto movimientoFound
         }
-      } else {
-        if (
-          updateMovimientoDto[key] &&
-          updateMovimientoDto[key] !== movimientoFound[key]
-        ) {
+      }
+      
+      if ((key == 'urlManifiesto' || key == 'urlBL' || key == 'urlExpediente') && updateMovimientoDto[key]) {
+
+        // console.log(key, updateMovimientoDto[key]);
+        // console.log(key, movimientoFound[key]);
+
+        // Se registra un nuevo archivo
+        if (!movimientoFound[key]) {
+          changes.push({
+            campoModificado: key,
+            valorAnterior: null,
+            valorActual: updateMovimientoDto[key],
+          });
+          movimientoFound[key] = updateMovimientoDto[key]; // Actualiza el valor en el objeto movimientoFound
+        }
+         
+      } 
+
+      if(key == 'horaInicio' || key == 'horaFin') {      
+        if (updateMovimientoDto[key] && updateMovimientoDto[key].toString() !== movimientoFound[key].toString().slice(0,5)) {
+          changes.push({
+            campoModificado: key,
+            valorAnterior: movimientoFound[key].toString().slice(0,5),
+            valorActual: updateMovimientoDto[key],
+          });
+          movimientoFound[key] = updateMovimientoDto[key]; // Actualiza el valor en el objeto movimientoFound
+        }
+      }
+      
+      if (key != 'urlManifiesto' && key != 'urlBL' && key != 'urlExpediente' && key != 'cantidad' && key != 'horaInicio' && key != 'horaFin') {
+        if (updateMovimientoDto[key] && updateMovimientoDto[key] !== movimientoFound[key]) {
           changes.push({
             campoModificado: key,
             valorAnterior: movimientoFound[key],
@@ -144,6 +169,7 @@ export class MovimientosService {
           movimientoFound[key] = updateMovimientoDto[key]; // Actualiza el valor en el objeto movimientoFound
         }
       }
+
     });
 
     if (changes.length === 0) {
@@ -157,6 +183,8 @@ export class MovimientosService {
       await movimientoFound.save();
 
       for (const change of changes) {
+        // console.log('se inserta auditoria', change);
+        
         const createAuditoriaDto = {
           campoModificado: change.campoModificado,
           valorAnterior: change.valorAnterior,
@@ -164,7 +192,13 @@ export class MovimientosService {
           usuarioResponsable,
           movimientoId: id,
         };
-        await this.auditService.create(createAuditoriaDto);
+
+        // Insertar registro de auditoria
+        try {
+          await this.auditService.create(createAuditoriaDto);
+        } catch (error) {
+          return error;
+        }
       }
 
       return new HttpException(
@@ -189,9 +223,7 @@ export class MovimientosService {
    * @param fechaHasta
    */
 
-  async filtrarMovimientos(
-    filtroMovimientoDto: FiltroMovimientoDto,
-  ): Promise<Movimientos[]> {
+  async filtrarMovimientos(filtroMovimientoDto: FiltroMovimientoDto): Promise<Movimientos[]> {
     const {
       productoId,
       proveedorId,
@@ -228,18 +260,19 @@ export class MovimientosService {
         { model: Puertos, attributes: ['nombre'] },
         { model: Estados, attributes: ['nombre', 'class'] },
       ],
-      order: [['fechaProbDescarga', 'ASC'],['horaInicio', 'ASC']],
+      order: [
+        ['fechaProbDescarga', 'ASC'],
+        ['horaInicio', 'ASC'],
+      ],
     });
   }
 
   /**
-   * Paginación
-   */
+  * Paginación
+  */
 
   // PAGINADO DE PRODUCTOS
-  async getMovimientosPaginados(
-    paginationMovimientoDto: PaginationMovimientoDto,
-  ): Promise<PaginatedMovimientoDto> {
+  async getMovimientosPaginados(paginationMovimientoDto: PaginationMovimientoDto): Promise<PaginatedMovimientoDto> {
     try {
       const counts = await this.movimientoModel.count();
 
@@ -301,7 +334,7 @@ export class MovimientosService {
 
   async getMovimientosLinea(): Promise<Movimientos[]> {
     console.log('movimientos en linea');
-    
+
     const hoy = new Date();
 
     const primerDiaMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
@@ -317,7 +350,7 @@ export class MovimientosService {
         fechaProbDescarga: {
           [Op.between]: [primerDiaMesFormated, fechaMas15Dias],
         },
-        horaInicio: { [Op.not]: null }
+        horaInicio: { [Op.not]: null },
       },
       include: [
         { model: Importadores, attributes: ['razonSocial'] },
@@ -330,7 +363,73 @@ export class MovimientosService {
         { model: Puertos, attributes: ['nombre'] },
         { model: Estados, attributes: ['nombre', 'class'] },
       ],
-      order: [['fechaProbDescarga', 'ASC'], ['horaInicio', 'ASC']],
+      order: [
+        ['fechaProbDescarga', 'ASC'],
+        ['horaInicio', 'ASC'],
+      ],
     });
+  }
+
+  /**
+   * Eliminar archivo adjunto
+   */
+
+  async removeFile(id: number, body: any, usuarioResponsable: string): Promise<HttpException> {
+    const movimientoFound = await this.findOne(id);
+
+    const campoModificado = body.campoModificado;
+
+    // Ruta completa del archivo a eliminar
+    const filePath = path.join('./', movimientoFound[campoModificado]);
+
+    const change = {
+      campoModificado: campoModificado,
+      valorAnterior: movimientoFound[campoModificado],
+      valorActual: null,
+    };
+    
+    movimientoFound[campoModificado] = null;
+    
+    try {
+      // Actualizar el campo del registro del movimiento
+      await movimientoFound.save();
+      
+      const createAuditoriaDto = {
+        campoModificado: change.campoModificado,
+        valorAnterior: change.valorAnterior,
+        valorActual: change.valorActual,
+        usuarioResponsable,
+        movimientoId: id,
+      };
+
+      // Insertar registro de auditoria
+      try {
+        await this.auditService.create(createAuditoriaDto);
+      } catch (error) {
+        return error;
+      }
+
+      // Eliminar el archivo
+      if (fs.existsSync(filePath)) {
+        console.log('Elimina el archivo', filePath);
+        
+        try {
+          fs.unlinkSync(filePath); // Elimina el archivo
+          return new HttpException('Movimiento actualizado correctamente', HttpStatus.OK);
+        } catch (error) {
+          throw new HttpException('Error deleting file', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+      } else {
+        throw new HttpException('File not found', HttpStatus.NOT_FOUND);
+      }
+
+    } catch (error) {
+      // throw new HttpException('Error interno', HttpStatus.SERVICE_UNAVAILABLE);
+      return error
+    }
+
+    
+
+    
   }
 }

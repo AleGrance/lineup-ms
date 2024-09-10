@@ -1,14 +1,21 @@
-import { IsNumber, IsPositive, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString } from 'class-validator';
 
 export class CreateAuditoriaDto {
-  @IsString()
+  @IsString({ message: 'El campo campoModificado debe ser un string' })
+  @IsNotEmpty({ message: 'El campo campoModificado no debe estar vacío' })
   campoModificado: string;
-  @IsString()
+
+  @IsOptional()
   valorAnterior: string;
-  @IsString()
+
+  @IsOptional()
   valorActual: string;
-  @IsString()
+
+  @IsString({ message: 'El campo usuarioResponsable debe ser un string' })
+  @IsNotEmpty({ message: 'El campo usuarioResponsable no debe estar vacío' })
   usuarioResponsable: string;
-  @IsPositive()
+
+  @IsPositive({ message: 'El campo movimientoId debe ser un número positivo' })
+  @IsNotEmpty({ message: 'El campo movimientoId no debe estar vacío' })
   movimientoId: number;
 }

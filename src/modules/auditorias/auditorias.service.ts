@@ -15,9 +15,10 @@ export class AuditoriasService {
     try {
       return await this.auditoriaModel.create(createAuditoriaDto);
     } catch (error) {
-      if (error.name === 'SequelizeUniqueConstraintError') {
-        throw new HttpException('Error interno', HttpStatus.BAD_REQUEST);
-      }
+      // if (error.name === 'SequelizeUniqueConstraintError') {
+      //   throw new HttpException('Error interno', HttpStatus.BAD_REQUEST);
+      // }
+      return error;
     }
   }
 
