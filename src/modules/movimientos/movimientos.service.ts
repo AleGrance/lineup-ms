@@ -180,11 +180,12 @@ export class MovimientosService {
     }
 
     try {
+
+      // Guarar los cambios del registro
       await movimientoFound.save();
 
+      // Guardar auditoria por cada cambio
       for (const change of changes) {
-        // console.log('se inserta auditoria', change);
-        
         const createAuditoriaDto = {
           campoModificado: change.campoModificado,
           valorAnterior: change.valorAnterior,
@@ -201,6 +202,7 @@ export class MovimientosService {
         }
       }
 
+      // Respuesta
       return new HttpException(
         'Movimiento actualizado correctamente',
         HttpStatus.OK,
@@ -335,22 +337,19 @@ export class MovimientosService {
   async getMovimientosLinea(): Promise<Movimientos[]> {
     console.log('movimientos en linea');
 
-    const hoy = new Date();
+    // const hoy = new Date();
 
-    const primerDiaMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    // const primerDiaMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
 
-    const primerDiaMesFormated = moment(primerDiaMes, 'yyyy-MM-dd');
-    const hoyFormated = moment(hoy, 'yyyy-MM-dd');
+    // const primerDiaMesFormated = moment(primerDiaMes, 'yyyy-MM-dd');
+    // const hoyFormated = moment(hoy, 'yyyy-MM-dd');
 
-    // Sumar 15 días a la fecha de hoy
-    const fechaMas15Dias = hoyFormated.add(15, 'days');
+    // // Sumar 15 días a la fecha de hoy
+    // const fechaMas15Dias = hoyFormated.add(15, 'days');
 
     return this.movimientoModel.findAll({
       where: {
-        fechaProbDescarga: {
-          [Op.between]: [primerDiaMesFormated, fechaMas15Dias],
-        },
-        horaInicio: { [Op.not]: null },
+        estadoId: {[Op.notIn]: [1]}
       },
       include: [
         { model: Importadores, attributes: ['razonSocial'] },
