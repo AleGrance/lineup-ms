@@ -95,6 +95,9 @@ export class MovimientosService {
   ): Promise<HttpException> {
     const movimientoFound = await this.findOne(id);
 
+    console.log(updateMovimientoDto);
+    
+
     let changes = [];
 
     [
@@ -149,11 +152,11 @@ export class MovimientosService {
       } 
 
       if(key == 'horaInicio' || key == 'horaFin') {      
-        if (updateMovimientoDto[key] && updateMovimientoDto[key].toString() !== movimientoFound[key].toString().slice(0,5)) {
+        if (updateMovimientoDto[key] && updateMovimientoDto[key] !== movimientoFound[key]) {
           changes.push({
             campoModificado: key,
             valorAnterior: movimientoFound[key].toString().slice(0,5),
-            valorActual: updateMovimientoDto[key],
+            valorActual: updateMovimientoDto[key].toString().slice(0,5),
           });
           movimientoFound[key] = updateMovimientoDto[key]; // Actualiza el valor en el objeto movimientoFound
         }
@@ -209,6 +212,7 @@ export class MovimientosService {
       );
     } catch (error) {
       throw new HttpException('Error interno', HttpStatus.SERVICE_UNAVAILABLE);
+      // return error
     }
   }
 
