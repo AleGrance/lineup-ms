@@ -155,8 +155,10 @@ export class MovimientosService {
         if (updateMovimientoDto[key] && updateMovimientoDto[key] !== movimientoFound[key]) {
           changes.push({
             campoModificado: key,
-            valorAnterior: movimientoFound[key].toString().slice(0,5),
-            valorActual: updateMovimientoDto[key].toString().slice(0,5),
+            valorAnterior: !movimientoFound[key] ? movimientoFound[key] : movimientoFound[key].toString().slice(0,5),
+            valorActual: !updateMovimientoDto[key] ? updateMovimientoDto[key] : updateMovimientoDto[key].toString().slice(0,5),
+            // valorAnterior: movimientoFound[key],
+            // valorActual: updateMovimientoDto[key],
           });
           movimientoFound[key] = updateMovimientoDto[key]; // Actualiza el valor en el objeto movimientoFound
         }
