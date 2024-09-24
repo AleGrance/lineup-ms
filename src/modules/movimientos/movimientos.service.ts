@@ -110,6 +110,7 @@ export class MovimientosService {
       'urlManifiesto',
       'urlBL',
       'urlExpediente',
+      'urlDespacho',
       'importadorId',
       'proveedorId',
       'productoId',
@@ -134,7 +135,7 @@ export class MovimientosService {
         }
       }
       
-      if ((key == 'urlManifiesto' || key == 'urlBL' || key == 'urlExpediente') && updateMovimientoDto[key]) {
+      if ((key == 'urlManifiesto' || key == 'urlBL' || key == 'urlExpediente' || key == 'urlDespacho') && updateMovimientoDto[key]) {
 
         // console.log(key, updateMovimientoDto[key]);
         // console.log(key, movimientoFound[key]);
@@ -164,7 +165,7 @@ export class MovimientosService {
         }
       }
       
-      if (key != 'urlManifiesto' && key != 'urlBL' && key != 'urlExpediente' && key != 'cantidad' && key != 'horaInicio' && key != 'horaFin') {
+      if (key != 'urlManifiesto' && key != 'urlBL' && key != 'urlExpediente' && key != 'urlDespacho' && key != 'cantidad' && key != 'horaInicio' && key != 'horaFin') {
         if (updateMovimientoDto[key] && updateMovimientoDto[key] !== movimientoFound[key]) {
           changes.push({
             campoModificado: key,

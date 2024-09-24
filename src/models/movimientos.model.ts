@@ -79,6 +79,12 @@ export class Movimientos extends Model<Movimientos> {
     type: DataType.STRING,
     allowNull: true,
   })
+  urlDespacho: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
   usuarioCreador: string;
 
   @Column({
